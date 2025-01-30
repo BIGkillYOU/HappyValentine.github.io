@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Valentine's Day!</title>
+</head>
+<body>
+  <h1>Messages</h1>
+  <div id="message-list">
+    Loading messages...
+  </div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwMMScp5wSFB0heDcLwktLcpKu2wUPYLJIeawVrg_we0wZHp-Od4tIaztFHDi4ztgcW/exec";
+
+fetch(scriptURL)
+  .then(response => {
+    console.log("HTTP Status:", response.status); // Log HTTP status
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log("Received Data:", data); // Log JSON data received
+    const messageList = document.getElementById('message-list');
+    messageList.innerHTML = ''; // ลบข้อความ "Loading messages..."
+
+    if (!Array.isArray(data) || data.length === 0) {
+      messageList.textContent = 'No messages found.';
+      return;
+    }
+
+    data.forEach(row => {
+      const messageDiv = document.createElement('div');
+      messageDiv.textContent = row.length > 1 ? `${row[0]} - ${row[1]}` : row[0];
+      messageList.appendChild(messageDiv);
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching messages:', error);
+    document.getElementById('message-list').textContent = 'Error loading messages.';
+  });         
+  </script>
+</body>
+</html>
