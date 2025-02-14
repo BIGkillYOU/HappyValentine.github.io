@@ -849,7 +849,7 @@ path {
 .tickle {
   font-family: inherit;
   cursor: pointer;
-  color: inherit;
+  color: #ff7878;
   transition: opacity 0.3s 2s, visibility 0.3s 2s;
 }
 .poofed ~ .tickle {
@@ -861,7 +861,7 @@ path {
 .refresh {
   font-family: inherit;
   cursor: pointer;
-  color: inherit;
+  color: #ff7878;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s, visibility 0.3s;
@@ -887,7 +887,7 @@ html {
   overflow: hidden;
   height: 100%;
   font-family: "Sacramento";
-  background: #C2D9D9;
+  background: #ffe6e6;
   color: #fff;
 }
 

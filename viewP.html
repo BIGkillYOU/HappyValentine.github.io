@@ -4,44 +4,104 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Happy Valentine's Day!</title>
+  <link rel="stylesheet" href="./card.css">
+  <script>
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxOqeJY4cGvv0E1gvjkakl3sO8pFU6z9ka_XeWG-iFQ9Wo02W5YL2bQVGH5xlGCgTj8Q/exec"; // แทนที่ด้วย URL ของคุณ
+
+    async function fetchMessages() {
+      try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        const messages = await response.json();
+        
+        const container = document.getElementById("message-container");
+        container.innerHTML = ""; // ล้างข้อความเก่าออกก่อน
+        
+        let messageCount = {}; // เก็บจำนวนครั้งที่พบข้อความแต่ละอัน
+        messages.forEach(msg => {
+          const text = msg.message.trim();
+          if (text in messageCount) {
+            messageCount[text] += 1;
+          } else {
+            messageCount[text] = 1;
+          }
+        });
+
+        Object.keys(messageCount).forEach(text => {
+          createRandomMessage(text, messageCount[text]);
+        });
+
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    }
+
+    function createRandomMessage(text, count) {
+      let messageElement = document.querySelector(`[data-text="${text}"]`);
+      
+      if (messageElement) {
+        // ถ้าข้อความนี้มีอยู่แล้ว ให้เพิ่มขนาดฟอนต์
+        let currentSize = parseFloat(window.getComputedStyle(messageElement).fontSize);
+        messageElement.style.fontSize = `${currentSize + count * 2}px`; // ยิ่งซ้ำมาก ยิ่งใหญ่ขึ้น
+      } else {
+        // ถ้ายังไม่มีข้อความนี้ ให้สร้างใหม่
+        messageElement = document.createElement("div");
+        messageElement.classList.add("floating-message");
+        messageElement.innerText = text;
+        messageElement.setAttribute("data-text", text);
+
+        // กำหนดตำแหน่งสุ่มบนหน้าจอ
+        const x = Math.random() * (window.innerWidth - 200);
+        const y = Math.random() * (window.innerHeight - 50);
+
+        messageElement.style.left = `${x}px`;
+        messageElement.style.top = `${y}px`;
+        messageElement.style.fontSize = `${16 + count * 2}px`; // ยิ่งซ้ำมาก ยิ่งใหญ่
+
+        document.getElementById("message-container").appendChild(messageElement);
+      }
+    }
+
+    window.onload = fetchMessages;
+  </script>
+  <style>
+    body {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #ffe6e6; /* พื้นหลังสีชมพู */
+    }
+
+    #message-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .floating-message {
+      position: absolute;
+      padding: 10px 15px;
+      font-family: Arial, sans-serif;
+      background-color: white;
+      color: #ff3939;
+      font-weight: bold;
+      border-radius: 10px;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Messages</h1>
-  <div id="message-list">
-    Loading messages...
-  </div>
-
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwMMScp5wSFB0heDcLwktLcpKu2wUPYLJIeawVrg_we0wZHp-Od4tIaztFHDi4ztgcW/exec";
-
-fetch(scriptURL)
-  .then(response => {
-    console.log("HTTP Status:", response.status); // Log HTTP status
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log("Received Data:", data); // Log JSON data received
-    const messageList = document.getElementById('message-list');
-    messageList.innerHTML = ''; // ลบข้อความ "Loading messages..."
-
-    if (!Array.isArray(data) || data.length === 0) {
-      messageList.textContent = 'No messages found.';
-      return;
-    }
-
-    data.forEach(row => {
-      const messageDiv = document.createElement('div');
-      messageDiv.textContent = row.length > 1 ? `${row[0]} - ${row[1]}` : row[0];
-      messageList.appendChild(messageDiv);
-    });
-  })
-  .catch(error => {
-    console.error('Error fetching messages:', error);
-    document.getElementById('message-list').textContent = 'Error loading messages.';
-  });         
-  </script>
+  <div id="message-container"></div>
 </body>
 </html>
